@@ -28,7 +28,7 @@
     },
     "extra": {
         "pass": {
-            "nginx-includes" : ["path/to/nginx.conf"]
+            "nginx-includes" : ["nginx.conf"]
         }
     }
 }
