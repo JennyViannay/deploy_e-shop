@@ -25,5 +25,10 @@
         "psr-4": {
             "App\\": "src/"
         }
+    },
+    "extra": {
+        "pass": {
+            "nginx-includes" : ["path/to/nginx.conf"]
+        }
     }
 }
