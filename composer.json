@@ -27,7 +27,7 @@
         }
     },
     "extra": {
-        "pass": {
+        "paas": {
             "nginx-includes" : ["nginx.conf"]
         }
     }
