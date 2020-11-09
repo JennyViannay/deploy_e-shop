@@ -10,6 +10,6 @@ if (class_exists($controller) && method_exists(new $controller(), $method)) {
 } else {
     header("HTTP/1.0 404 Not Found");
     echo '404 - Page not found';
-    var_dump($routeParts, $controller, $method, $vars); die;
+    var_dump($routeParts, $controller, $method, $vars);
     exit();
 }
