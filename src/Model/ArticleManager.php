@@ -2,9 +2,6 @@
 
 namespace App\Model;
 
-/**
- *
- */
 class ArticleManager extends AbstractManager
 {
     const TABLE = 'article';

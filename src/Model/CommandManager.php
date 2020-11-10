@@ -2,31 +2,17 @@
 
 namespace App\Model;
 
-/**
- *
- */
 class CommandManager extends AbstractManager
 {
-    /**
-     *
-     */
     const TABLE = 'command';
 
-    /**
-     *  Initializes this class.
-     */
     public function __construct()
     {
         parent::__construct(self::TABLE);
     }
 
-    /**
-     * @param array $article
-     * @return int
-     */
     public function insert(array $data): int
     {
-        // prepared request
         $statement = $this->pdo->prepare("INSERT INTO " . self::TABLE . " (name, address, total, created_at) VALUES (:name, :address, :total, :created_at)");
         $statement->bindValue('name', $data['name'], \PDO::PARAM_STR);
         $statement->bindValue('address', $data['address'], \PDO::PARAM_STR);
@@ -38,10 +24,6 @@ class CommandManager extends AbstractManager
         }
     }
 
-
-    /**
-     * @param int $id
-     */
     public function delete(int $id): void
     {
         // prepared request
@@ -50,11 +32,6 @@ class CommandManager extends AbstractManager
         $statement->execute();
     }
 
-
-    /**
-     * @param array $article
-     * @return bool
-     */
     public function update(array $article):bool
     {
 
