@@ -176,7 +176,7 @@ class HomeController extends AbstractController
                 'article_id' => $id
             ];
             $wishlistManager->insert($wish);
-            header('Location:/');
+            header('Location:/home/articles');
         } 
     }
 
@@ -184,7 +184,7 @@ class HomeController extends AbstractController
     {
         $wishlistManager = new WishlistManager();
         $wishlistManager->delete($id, $_SESSION['id']);
-        header('Location:/');
+        header('Location:/home/articles');
     }
 
     public function clear_flash()
