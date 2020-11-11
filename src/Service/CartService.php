@@ -105,11 +105,9 @@ class CartService
         $articleManager = new ArticleManager();
         $commandArticleManager = new CommandArticleManager();
 
-
-
         $commandManager = new CommandManager();
         $data = [
-            'name' => $_SESSION['id'],
+            'user_id' => $_SESSION['id'],
             'address' => $infos['address'],
             'total' => $this->totalCart(),
             'date' => date("Y-m-d")

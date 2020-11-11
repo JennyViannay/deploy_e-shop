@@ -13,8 +13,8 @@ class CommandManager extends AbstractManager
 
     public function insert(array $data): int
     {
-        $statement = $this->pdo->prepare("INSERT INTO " . self::TABLE . " (name, address, total, created_at) VALUES (:name, :address, :total, :created_at)");
-        $statement->bindValue('name', $data['name'], \PDO::PARAM_STR);
+        $statement = $this->pdo->prepare("INSERT INTO " . self::TABLE . " (user_id, address, total, created_at) VALUES (:user_id, :address, :total, :created_at)");
+        $statement->bindValue('user_id', $data['user_id'], \PDO::PARAM_INT);
         $statement->bindValue('address', $data['address'], \PDO::PARAM_STR);
         $statement->bindValue('total', $data['total'], \PDO::PARAM_INT);
         $statement->bindValue('created_at', $data['date']);
@@ -31,14 +31,4 @@ class CommandManager extends AbstractManager
         $statement->execute();
     }
 
-    public function update(array $article):bool
-    {
-        $statement = $this->pdo->prepare("UPDATE " . self::TABLE . " SET name=:name, price=:price, img=:img WHERE id=:id");
-        $statement->bindValue('id', $article['id'], \PDO::PARAM_INT);
-        $statement->bindValue('name', $article['name'], \PDO::PARAM_STR);
-        $statement->bindValue('price', $article['price'], \PDO::PARAM_INT);
-        $statement->bindValue('img', $article['img'], \PDO::PARAM_STR);
-
-        return $statement->execute();
-    }
 }
