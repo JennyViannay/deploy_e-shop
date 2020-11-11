@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\CartService;
 use App\Model\ArticleManager;
+use App\Model\CommandManager;
 use App\Model\UserManager;
 use App\Model\WishlistManager;
 use App\Service\SecurityService;
@@ -20,6 +21,9 @@ class UserController extends AbstractController
 
         $wishlistManager = new WishlistManager();
         $wishlist = $wishlistManager->getWishlistByUser($user['id']);
+
+        $commandManager = new CommandManager();
+        $userCommands = $commandManager->getOrdersByUser($user['id']);
 
         $articleManager = new ArticleManager();
         $articlesDetails = [];
@@ -48,6 +52,7 @@ class UserController extends AbstractController
 
         return $this->twig->render('User/index.html.twig', [
             'user' => $user,
+            'commands' => $userCommands,
             'wishlist' => $articlesDetails
         ]);
     }
@@ -59,14 +64,20 @@ class UserController extends AbstractController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_POST['email']) && !empty($_POST['username'])) {
-                $emailExist = $userManager->search($_POST['email']);
-                if (!$emailExist) {
+                if ($user['email'] != $_POST['email']){
+                    $emailExist = $userManager->search($_POST['email']);
+                    if (!$emailExist) {
+                        $userManager->update($_POST);
+                        header('Location:/user/index');
+                    } else {
+                        $_SESSION['flash_message'] = ['Email already exist !'];
+                        header('Location:/user/update');
+                    }
+                } else {
                     $userManager->update($_POST);
                     header('Location:/user/index');
-                } else {
-                    $_SESSION['flash_message'] = ['Email already exist !'];
-                    header('Location:/user/update');
                 }
+                
             } else {
                 $_SESSION['flash_message'] = ['All fields required !'];
                 header('Location:/user/update');

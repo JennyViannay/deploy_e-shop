@@ -4,7 +4,6 @@ namespace App\Service;
 
 class SecurityService 
 {
-    
 
     public function passwordIsValid (string $password, array $user) 
     {

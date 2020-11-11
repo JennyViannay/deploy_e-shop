@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row pl-2">
-        <h3 class="big-title text-xxl">| Account</h3>
+        <h3 class="big-title text-xxl">Hello {{user.username}} !</h3>
     </div>
     {% if session.flash_message is not empty %}
     {% for message in session.flash_message %}
@@ -23,14 +23,14 @@
     <form method="POST">
         <div class="row pl-2 my-3 text-center">
             <div class="col-lg-6 col-md-6 col-xs-12 mb-4">
-                <label for="password">{{user.email}} || {{user.username}}</label>
+                <label for="password">{{user.email}} || plop</label>
                 <input type="password" class="form-control" name="password" id="password" value="1234">
             </div>
             {% if session.id == 2 %}
             <div class="col-lg-6 col-md-6 col-xs-12 text-center pb-5">
-                    <button type="submit" class="btn btn-red big-title text-lg" name="update_user" data-toggle="tooltip"
-                        data-placement="top" title="try 'plop' password for plop user">Update
-                        informations</button>
+                <button type="submit" class="btn btn-red big-title text-lg" name="update_user" data-toggle="tooltip"
+                    data-placement="top" title="try 'plop' password for plop user">Update
+                    informations</button>
             </div>
             {% else %}
             <div class="col-lg-6 col-md-6 col-xs-12 text-center pb-5">
@@ -41,10 +41,51 @@
         </div>
     </form>
     <div class="col-12 my-5">
-        <h3>Order history</h3>
-        <p>Nothing yet here...</p>
+        {% if commands|length > 0 %}
+            <h3>Order history</h3>
+            <div class="card card-body">
+                <ul class="list-group">
+                    {% for command in commands %}
+                    <li class="list-group-item">
+                        <a data-toggle="collapse" href="#collapseOrder{{command.id}}" role="button"
+                            aria-expanded="false" aria-controls="collapseOrder">Order #{{command.id}} -
+                            {{command.created_at|date('Y/m/d')}} </a>
+                        <span class="float-right big-title"> {{command.total}} $</span>
+                        <div class="collapse" id="collapseOrder{{command.id}}">
+                            <div class="card-body">
+                                {% for item in command.articles %}
+                                <ul class="list-group">
+                                    <li class="list-group-item border-0">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <a href="/home/showArticle/{{item.article.id}}">{{item.qty}} x
+                                                    {{item.article.model}}</a>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>size {{item.article.size}} -
+                                                    {{item.article.color_name}}</small>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>{{item.article.price }} $</small>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>{{item.article.price * item.qty}} $</small>
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+        </div>
+        {% endif %}
     </div>
     <div class="col-12 my-5">
+        {% if wishlist|length > 0 %}
         <h3>Wishlist</h3>
         <div class="row">
             {% for article in wishlist %}
@@ -115,7 +156,7 @@
             </div>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
-</div>
 </div>
 {% endblock %}
