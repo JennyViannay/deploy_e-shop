@@ -6,7 +6,6 @@ use Stripe\Stripe;
 use App\Model\ArticleManager;
 use App\Model\CommandArticleManager;
 use App\Model\CommandManager;
-use App\Model\UserCommandManager;
 
 class CartService
 {
@@ -105,23 +104,14 @@ class CartService
         $articleManager = new ArticleManager();
         $commandArticleManager = new CommandArticleManager();
 
-
-
         $commandManager = new CommandManager();
         $data = [
-            'name' => $_SESSION['id'],
+            'user_id' => $_SESSION['id'],
             'address' => $infos['address'],
             'total' => $this->totalCart(),
             'date' => date("Y-m-d")
         ];
         $idCommand = $commandManager->insert($data);
-
-        $userCommandManager = new UserCommandManager();
-        $newCommandUser = [
-            'id_user' => $_SESSION['id'],
-            'id_command' => $idCommand
-        ];
-        $userCommandManager->insert($newCommandUser);
 
         foreach ($_SESSION['cart'] as $idArticle => $qty) {
             $articleManager->updateQty($idArticle, $qty);

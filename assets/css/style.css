@@ -117,6 +117,13 @@ a:hover {
     text-decoration: none;
 }
 
+/* ALERTS */
+.alert-danger {
+    color: var(--red);
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
 /* ARTICLES */
 
 .carousel-control-next-icon {
@@ -210,10 +217,12 @@ footer a:hover {
 
 /* IMAGES */
 
-.card-img-top {
-    width: 100%;
-    height: 20vw;
-    object-fit: cover;
+.img-article {
+    height : 250px;
+}
+
+.img-article-cart {
+    height : 200px;
 }
 
 /* BUTTON */
@@ -290,5 +299,13 @@ footer a:hover {
 @media screen and (max-width: 740px) {
     .text-xxl {
         font-size: 3em;
+    }
+
+    .img-article {
+        height : 300px;
+    }
+
+    .img-article-cart {
+        height : 300px;
     }
 }

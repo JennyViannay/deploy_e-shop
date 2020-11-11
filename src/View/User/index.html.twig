@@ -3,27 +3,97 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row">
+    <div class="row pl-2">
+        <h3 class="big-title text-xxl">Hello {{user.username}} !</h3>
+    </div>
+    {% if session.flash_message is not empty %}
+    {% for message in session.flash_message %}
+    <div class="row pl-2">
         <div class="col-12">
-            <div class="text-right">
-                <a href="" class="btn btn-red text-lg">Update informations</a> 
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>{{message}}</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" id="clear_flash">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <h3>Account</h3>
-            <p>{{user.email}}</p>
-            <input type="password" name="" id="" value="123456">
         </div>
-        <div class="col-12 my-5">
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form method="POST">
+        <div class="row pl-2 my-3 text-center">
+            <div class="col-lg-6 col-md-6 col-xs-12 mb-4">
+                <label for="password">{{user.email}} || plop</label>
+                <input type="password" class="form-control" name="password" id="password" value="1234">
+            </div>
+            {% if session.id == 2 %}
+            <div class="col-lg-6 col-md-6 col-xs-12 text-center pb-5">
+                <button type="submit" class="btn btn-red big-title text-lg" name="update_user" data-toggle="tooltip"
+                    data-placement="top" title="try 'plop' password for plop user">Update
+                    informations</button>
+            </div>
+            {% else %}
+            <div class="col-lg-6 col-md-6 col-xs-12 text-center pb-5">
+                <button type="submit" class="btn btn-red big-title text-lg" name="update_user">Update
+                    informations</button>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+    <div class="col-12 my-5">
+        {% if commands|length > 0 %}
             <h3>Order history</h3>
-            <p>Nothing yet here...</p>
+            <div class="card card-body">
+                <ul class="list-group">
+                    {% for command in commands %}
+                    <li class="list-group-item">
+                        <a data-toggle="collapse" href="#collapseOrder{{command.id}}" role="button"
+                            aria-expanded="false" aria-controls="collapseOrder">Order #{{command.id}} -
+                            {{command.created_at|date('Y/m/d')}} </a>
+                        <span class="float-right big-title"> {{command.total}} $</span>
+                        <div class="collapse" id="collapseOrder{{command.id}}">
+                            <div class="card-body">
+                                {% for item in command.articles %}
+                                <ul class="list-group">
+                                    <li class="list-group-item border-0">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <a href="/home/showArticle/{{item.article.id}}">{{item.qty}} x
+                                                    {{item.article.model}}</a>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>size {{item.article.size}} -
+                                                    {{item.article.color_name}}</small>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>{{item.article.price }} $</small>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-xs-12 text-center">
+                                                <small>{{item.article.price * item.qty}} $</small>
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
         </div>
-        <div class="col-12 my-5">
-            <h3>Wishlist</h3>
-            <div class="row">
-                {% for article in wishlist %}
-                <div class="col-lg-3 col-md-4 col-xs-12 my-3 d-flex align-items-stretch">
-                    <div class="card">
-                        <div class="mx-auto">
-                            {% if article.images|length > 1 %}
+        {% endif %}
+    </div>
+    <div class="col-12 my-5">
+        {% if wishlist|length > 0 %}
+        <h3>Wishlist</h3>
+        <div class="row">
+            {% for article in wishlist %}
+            <div class="col-lg-3 col-md-4 col-xs-12 my-3 d-flex align-items-stretch">
+                <div class="card">
+                    <div class="mx-auto">
+                        {% if article.images|length > 1 %}
+                        <div class="img-article-cart">
                             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
@@ -46,44 +116,47 @@
                                     <span class="sr-only text-dark">Next</span>
                                 </a>
                             </div>
-                            {% else %}
-                            <img src="{{article.images[0].url}}" class="d-block w-100" alt="">
-                            {% endif %}
                         </div>
-                        <div class="card-footer bg-white">
-                            <div class="row">
-                                <div class="col-10">
-                                    <a href="/home/showArticle/{{article.id}}">
-                                        <h5 class="card-title">{{article.model}} - {{article.brand_name}} -
-                                            <small>{{article.price}} $</small></h5>
-                                    </a>
-                                </div>
-                                <div class="col-2">
-                                    <div class="text-right">
-                                        {% if session.username is not empty %}
-                                        {% if article.is_liked == true %}
-                                        <a href="/home/dislike/{{ article.id }}"><i class="fas fa-heart"></i></a>
-                                        {% else %}
-                                        <a href="/home/like/{{ article.id }}"><i class="far fa-heart"></i></a>
-                                        {% endif %}
-                                        {% endif %}
-                                    </div>
+                        {% else %}
+                        <div class="img-article-cart">
+                            <img src="{{article.images[0].url}}" class="d-block w-100" alt="">
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white">
+                        <div class="row">
+                            <div class="col-10">
+                                <a href="/home/showArticle/{{article.id}}">
+                                    <h5 class="card-title">{{article.model}} - {{article.brand_name}} -
+                                        <small>{{article.price}} $</small></h5>
+                                </a>
+                            </div>
+                            <div class="col-2">
+                                <div class="text-right">
+                                    {% if session.username is not empty %}
+                                    {% if article.is_liked == true %}
+                                    <a href="/home/dislike/{{ article.id }}"><i class="fas fa-heart"></i></a>
+                                    {% else %}
+                                    <a href="/home/like/{{ article.id }}"><i class="far fa-heart"></i></a>
+                                    {% endif %}
+                                    {% endif %}
                                 </div>
                             </div>
-                            <p>size : {{article.size}}</p>
-                            {% if article.qty > 0 %}
-                            <form method="POST">
-                                <input type="text" class="d-none" name="add_article" value="{{article.id}}">
-                                <button type="submit" class="btn btn-green btn-lg btn-block mt-4"><i class="fas fa-cart-arrow-down"
-                                        style="width: 100%"></i></a>
-                            </form>
-                            {% endif %}
                         </div>
+                        <p>size : {{article.size}}</p>
+                        {% if article.qty > 0 %}
+                        <form method="POST">
+                            <input type="text" class="d-none" name="add_article" value="{{article.id}}">
+                            <button type="submit" class="btn btn-green btn-lg btn-block mt-4"><i
+                                    class="fas fa-cart-arrow-down" style="width: 100%"></i></a>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

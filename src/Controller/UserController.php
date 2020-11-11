@@ -4,19 +4,26 @@ namespace App\Controller;
 
 use App\Service\CartService;
 use App\Model\ArticleManager;
+use App\Model\CommandManager;
 use App\Model\UserManager;
 use App\Model\WishlistManager;
+use App\Service\SecurityService;
 
 class UserController extends AbstractController
 {
     public function index()
     {
+        $securityService = new SecurityService();
         $cartService = new CartService();
+
         $userManager = new UserManager();
         $user = $userManager->selectOneById($_SESSION['id']);
 
         $wishlistManager = new WishlistManager();
         $wishlist = $wishlistManager->getWishlistByUser($user['id']);
+
+        $commandManager = new CommandManager();
+        $userCommands = $commandManager->getOrdersByUser($user['id']);
 
         $articleManager = new ArticleManager();
         $articlesDetails = [];
@@ -32,11 +39,53 @@ class UserController extends AbstractController
                 $article = $_POST['add_article'];
                 $cartService->add($article);
             }
+            if (isset($_POST['update_user']) && isset($_POST['password'])) {
+                $isValid = $securityService->passwordIsValid($_POST['password'], $user);
+                if(!$isValid) {
+                    $_SESSION['flash_message'] = ['Password wrong'];
+                    header('Location:/user/index');
+                } else {
+                    header('Location:/user/update');
+                }
+            }
         }
 
         return $this->twig->render('User/index.html.twig', [
             'user' => $user,
+            'commands' => $userCommands,
             'wishlist' => $articlesDetails
+        ]);
+    }
+
+    public function update ()
+    {
+        $userManager = new UserManager();
+        $user = $userManager->selectOneById($_SESSION['id']);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!empty($_POST['email']) && !empty($_POST['username'])) {
+                if ($user['email'] != $_POST['email']){
+                    $emailExist = $userManager->search($_POST['email']);
+                    if (!$emailExist) {
+                        $userManager->update($_POST);
+                        header('Location:/user/index');
+                    } else {
+                        $_SESSION['flash_message'] = ['Email already exist !'];
+                        header('Location:/user/update');
+                    }
+                } else {
+                    $userManager->update($_POST);
+                    header('Location:/user/index');
+                }
+                
+            } else {
+                $_SESSION['flash_message'] = ['All fields required !'];
+                header('Location:/user/update');
+            }
+        }
+
+        return $this->twig->render('User/update.html.twig', [
+            'user' => $user
         ]);
     }
 }
