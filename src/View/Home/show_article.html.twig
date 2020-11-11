@@ -2,7 +2,19 @@
 {% block title %}- {{article.model}}{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="border mt-5 p-5 box-shadow">
+    {% if session.flash_message is not empty %}
+    {% for message in session.flash_message %}
+    <div class="col-12 mt-5">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>{{message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" id="clear_flash">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="border mt-3 p-5 box-shadow">
         <div class="row">
             <div class="col-lg-6 col-md-6 col-xs-12">
                 {% if article.images|length > 1 %}
@@ -57,8 +69,8 @@
                     Colors :
                     {% for color in article.sizes_colors %}
                     {% if article.color_name != color.color_name %}
-                        <a href="/home/showArticle/{{color.sizes[0].article_id}}"
-                            class="btn rounded-circle bg-{{color.color_name|lower}} p-3 m-2 text-white"></a>
+                    <a href="/home/showArticle/{{color.sizes[0].article_id}}"
+                        class="btn rounded-circle bg-{{color.color_name|lower}} p-3 m-2 text-white"></a>
                     {% endif %}
                     {% endfor %}
                 </div>

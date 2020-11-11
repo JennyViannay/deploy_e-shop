@@ -38,9 +38,9 @@ class SecurityController extends AbstractController
 
     public function register()
     {
+        $error = false;
         $userManager = new UserManager();
         $roleManager = new RoleManager();
-        $error = false;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_POST['email']) &&
                 !empty($_POST['username']) &&
@@ -75,11 +75,30 @@ class SecurityController extends AbstractController
                 }
             }
         }
-        return $this->twig->render('Security/register.html.twig', [
-            'error' => $error
-        ]);
+        return $this->twig->render('Security/register.html.twig');
     }
 
+    public function changePassword ()
+    {
+        $userManager = new UserManager();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($_POST['password'] != $_POST['password2']) {
+                $_SESSION['flash_message'] = ['Password do not match'];
+                header('Location:/security/changePassword');
+            } else {
+                if (intval($_SESSION['id']) === 1 || intval($_SESSION['id']) === 2) {
+                    header('Location:/user/index');
+                }
+                $passHash = md5($_POST['password']);
+                $userManager->updatePassword($_SESSION['id'], $passHash);
+                $_SESSION['flash_message'] = ['Password changed'];
+                header('Location:/user/index');
+            }
+        }
+
+        return $this->twig->render('Security/change_password.html.twig');
+    }
+    
     public function logout()
     {
         session_destroy();

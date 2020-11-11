@@ -2,9 +2,6 @@
 
 namespace App\Model;
 
-/**
- *
- */
 class ArticleManager extends AbstractManager
 {
     const TABLE = 'article';
@@ -128,6 +125,75 @@ class ArticleManager extends AbstractManager
         return $this->getArticlesImages($articles);
     }
 
+    public function searchByColorAndBrand(int $color, int $brand)
+    {
+        $statement = $this->pdo->prepare("SELECT
+        art.id, art.brand_id, art.model, art.qty, art.model, art.price, art.size_id, art.color_id, 
+        brand.name as brand_name,
+        color.name as color_name,
+        size.size as size 
+        FROM article as art 
+        JOIN brand ON art.brand_id=brand.id
+        JOIN color ON art.color_id=color.id
+        JOIN size ON art.size_id=size.id 
+        WHERE brand_id = :brand_id
+        AND color_id = :color_id
+        ORDER BY model ASC
+        ");
+        $statement->bindValue('brand_id', $brand, \PDO::PARAM_INT);
+        $statement->bindValue('color_id', $color, \PDO::PARAM_INT);
+        $statement->execute();
+        $articles = $statement->fetchAll();
+
+        return $this->getArticlesImages($articles);
+    }
+
+    public function searchBySizeAndBrand(int $size, int $brand)
+    {
+        $statement = $this->pdo->prepare("SELECT
+        art.id, art.brand_id, art.model, art.qty, art.model, art.price, art.size_id, art.color_id, 
+        brand.name as brand_name,
+        color.name as color_name,
+        size.size as size 
+        FROM article as art 
+        JOIN brand ON art.brand_id=brand.id
+        JOIN color ON art.color_id=color.id
+        JOIN size ON art.size_id=size.id 
+        WHERE size_id = :size_id
+        AND brand_id = :brand_id
+        ORDER BY model ASC
+        ");
+        $statement->bindValue('size_id', $size, \PDO::PARAM_INT);
+        $statement->bindValue('brand_id', $brand, \PDO::PARAM_INT);
+        $statement->execute();
+        $articles = $statement->fetchAll();
+
+        return $this->getArticlesImages($articles);
+    }
+
+    public function searchBySizeAndColor(int $size, int $color)
+    {
+        $statement = $this->pdo->prepare("SELECT
+        art.id, art.brand_id, art.model, art.qty, art.model, art.price, art.size_id, art.color_id, 
+        brand.name as brand_name,
+        color.name as color_name,
+        size.size as size 
+        FROM article as art 
+        JOIN brand ON art.brand_id=brand.id
+        JOIN color ON art.color_id=color.id
+        JOIN size ON art.size_id=size.id 
+        WHERE size_id = :size_id
+        AND color_id = :color_id
+        ORDER BY model ASC
+        ");
+        $statement->bindValue('size_id', $size, \PDO::PARAM_INT);
+        $statement->bindValue('color_id', $color, \PDO::PARAM_INT);
+        $statement->execute();
+        $articles = $statement->fetchAll();
+
+        return $this->getArticlesImages($articles);
+    }
+
     public function searchFull(int $color_id, int $size_id, int $brand_id): array
     {
         $statement = $this->pdo->prepare("SELECT
@@ -212,6 +278,20 @@ class ArticleManager extends AbstractManager
         ORDER BY art.id DESC LIMIT 9");
 
         return $this->getArticlesImages($statement->fetchAll());
+    }
+
+    // STOCK
+    public function updateQty($idArticle, $qty)
+    {
+        $statement = $this->pdo->prepare("SELECT qty FROM " . self::TABLE . " WHERE id=:id");
+        $statement->bindValue('id', $idArticle, \PDO::PARAM_INT);
+        $statement->execute();  
+        $oldQty = $statement->fetch();
+        $newQty = $oldQty['qty'] - $qty;
+        $statement = $this->pdo->prepare("UPDATE " . self::TABLE . " SET qty=:qty WHERE id=:id");
+        $statement->bindValue('id', $idArticle, \PDO::PARAM_INT);
+        $statement->bindValue('qty', $newQty, \PDO::PARAM_INT);
+        $statement->execute();   
     }
 
     // PRIVATES METHODS

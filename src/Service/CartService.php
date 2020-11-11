@@ -4,26 +4,43 @@ namespace App\Service;
 
 use Stripe\Stripe;
 use App\Model\ArticleManager;
+use App\Model\CommandArticleManager;
 use App\Model\CommandManager;
 
-class CartService 
+class CartService
 {
-    public function add($article)
+    public function add($id)
     {
-        if (!empty($_SESSION['cart'][$article])) {
-            $_SESSION['cart'][$article]++;
+        $articleManager = new ArticleManager();
+        $article = $articleManager->selectOneById($id);
+        if (!empty($_SESSION['cart'][$id])) {
+            $newCount = intval($article['qty']) - intval($_SESSION['cart'][$article['id']] + 1);
+            if ($newCount >= 0) {
+                $_SESSION['cart'][$id]++;
+            } else {
+                $_SESSION['flash_message'] = ["Article " . $article['model'] . " is only available in " . $article['qty'] ." examples !"];
+                header('Location:/home/cart/');
+            }
         } else {
-            $_SESSION['cart'][$article] = 1;
+            $_SESSION['cart'][$id] = 1;
         }
         $_SESSION['count'] = $this->countArticle();
-        header('Location:/home/articles');
+        header('Location:/home/showArticle/' .$id);
     }
 
     public function update(array $array)
     {
-        for ($i = 0; $i < count($array['id']); $i++ ) {
-            foreach ($_SESSION['cart'] as $key => $value) {
-                $_SESSION['cart'][$array['id'][$i]] = $array['qty'][$i]; 
+        $articleManager = new ArticleManager();
+        for ($i = 0; $i < count($array['id']); $i++) {
+            $article = $articleManager->selectOneById($array['id'][0]);
+            foreach ($_SESSION['cart'] as $id => $qty) {
+                $newCount = $article['qty'] - $array['qty'][$i];
+                if ($newCount >= 0) {
+                    $_SESSION['cart'][$array['id'][$i]] = $array['qty'][$i];
+                } else {
+                    $_SESSION['flash_message'] = ["Article " . $article['model'] . " is only available in " . $article['qty'] ." examples !"];
+                    header('Location:/home/cart/');
+                }
             }
         }
         header('Location:/home/cart');
@@ -32,7 +49,7 @@ class CartService
     public function delete($article)
     {
         $cart = $_SESSION['cart'];
-        if(!empty($cart[$article])) {
+        if (!empty($cart[$article])) {
             unset($cart[$article]);
         }
         $_SESSION['cart'] = $cart;
@@ -42,25 +59,25 @@ class CartService
 
     public function cartInfos()
     {
-        if(isset($_SESSION['cart'])){
+        if (isset($_SESSION['cart'])) {
             $cart = $_SESSION['cart'];
             $cartInfos = [];
             $articleManager = new ArticleManager();
-            foreach($cart as $id => $qty){
+            foreach ($cart as $id => $qty) {
                 $infosArticle = $articleManager->selectOneById($id);
                 $infosArticle['qty'] = $qty;
                 $cartInfos[] = $infosArticle;
             }
             return $cartInfos;
-        } 
+        }
         return false;
     }
 
     function totalCart()
     {
         $total = 0;
-        if($this->cartInfos() != false){
-            foreach($this->cartInfos() as $item){
+        if ($this->cartInfos() != false) {
+            foreach ($this->cartInfos() as $item) {
                 $total += $item['price'] * $item['qty'];
             }
             return $total;
@@ -71,8 +88,8 @@ class CartService
     public function countArticle()
     {
         $total = 0;
-        if($this->cartInfos() != false){
-            foreach($this->cartInfos() as $item){
+        if ($this->cartInfos() != false) {
+            foreach ($this->cartInfos() as $item) {
                 $total += $item['qty'];
             }
             return $total;
@@ -84,14 +101,27 @@ class CartService
     {
         $stripe = \Stripe\Stripe::setApiKey(API_KEY);
 
+        $articleManager = new ArticleManager();
+        $commandArticleManager = new CommandArticleManager();
+
         $commandManager = new CommandManager();
         $data = [
-            'name' => $infos['name'],
+            'user_id' => $_SESSION['id'],
             'address' => $infos['address'],
             'total' => $this->totalCart(),
             'date' => date("Y-m-d")
         ];
-        $commandManager->insert($data);
+        $idCommand = $commandManager->insert($data);
+
+        foreach ($_SESSION['cart'] as $idArticle => $qty) {
+            $articleManager->updateQty($idArticle, $qty);
+            $newCommandArticle = [
+                'id_command' => $idCommand,
+                'id_article' => $idArticle,
+                'qty' => $qty
+            ];
+            $commandArticleManager->insert($newCommandArticle);
+        }
 
         try {
             $data = [
@@ -112,25 +142,13 @@ class CartService
             unset($_SESSION['count']);
             $_SESSION['transaction'] = $charge->receipt_url;
 
-            $sender = 'jenny.test4php@gmail.com';
-            $recipient = 'jenny.viannay75@gmail.com';
-
-            $subject = "Commande confirmée";
-            $message = "Félicitation, vous recevrez votre commande dans un délai de 48h !";
-            $headers = 'From:' . $sender;
-
-            $isSend = mail($recipient, $subject, $message, $headers);
-            if (!$isSend) {
-                var_dump("Error: Message not accepted"); die;
-            }
-
             header('Location:/home/success');
         } catch (\Stripe\Exception\ApiErrorException $e) {
             $e->getError();
         }
     }
 
-    public function suggest():array
+    public function suggest(): array
     {
         $articleManager = new ArticleManager();
         $articles = $articleManager->selectAll();
