@@ -2,9 +2,6 @@
 
 namespace App\Model;
 
-/**
- *
- */
 class ImageManager extends AbstractManager
 {
     const TABLE = 'image';
