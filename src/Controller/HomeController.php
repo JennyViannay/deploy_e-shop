@@ -102,6 +102,7 @@ class HomeController extends AbstractController
         $wishlist = null;
         $suggest = null;
         $articlesDetails = [];
+        $suggestArticles = [];
         $cartService = new CartService();
         $filterService = new FilterService();
         $wishlistManager = new WishlistManager();
@@ -153,11 +154,22 @@ class HomeController extends AbstractController
             }
         }
 
+        if($suggest){
+            foreach ($suggest as $article) {
+                foreach($wishlist as $wish){
+                    if($wish['article_id'] === $article['id']){
+                        $article['is_liked'] = 'true';    
+                    }
+                }
+                $suggestArticles[] = $article; 
+            }
+        } 
+
         return $this->twig->render('Home/cart.html.twig', [
             'cartInfos' => $cartService->cartInfos() ? $cartService->cartInfos() : null,
             'total' => $cartService->cartInfos() ? $cartService->totalCart() : null,
             'wishlist' => $articlesDetails,
-            'suggest' =>  $suggest
+            'suggest' =>  $suggestArticles
         ]);
     }
 

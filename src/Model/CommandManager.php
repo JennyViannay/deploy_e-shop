@@ -26,7 +26,6 @@ class CommandManager extends AbstractManager
 
     public function delete(int $id): void
     {
-        // prepared request
         $statement = $this->pdo->prepare("DELETE FROM " . self::TABLE . " WHERE id=:id");
         $statement->bindValue('id', $id, \PDO::PARAM_INT);
         $statement->execute();
@@ -34,8 +33,6 @@ class CommandManager extends AbstractManager
 
     public function update(array $article):bool
     {
-
-        // prepared request
         $statement = $this->pdo->prepare("UPDATE " . self::TABLE . " SET name=:name, price=:price, img=:img WHERE id=:id");
         $statement->bindValue('id', $article['id'], \PDO::PARAM_INT);
         $statement->bindValue('name', $article['name'], \PDO::PARAM_STR);
