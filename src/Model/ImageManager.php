@@ -11,6 +11,12 @@ class ImageManager extends AbstractManager
         parent::__construct(self::TABLE);
     }
 
+    public function selectAll(): array
+    {
+        return $this->pdo->query("SELECT image.id, image.url, image.article_id, article.model as article_model FROM image
+        JOIN article ON article.id = image.article_id")->fetchAll();
+    }
+
     public function insert(array $data): int
     {
         $statement = $this->pdo->prepare("INSERT INTO " . self::TABLE . " (url, article_id) VALUES (:url, :article_id)");
@@ -36,5 +42,14 @@ class ImageManager extends AbstractManager
         $statement = $this->pdo->prepare("DELETE FROM " . self::TABLE . " WHERE id=:id");
         $statement->bindValue('id', $id, \PDO::PARAM_INT);
         $statement->execute();
+    }
+
+    public function selectByArticle(int $id): array
+    {
+        $statement = $this->pdo->prepare("SELECT * FROM " . self::TABLE . " WHERE article_id=:id");
+        $statement->bindValue('id', $id, \PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 }

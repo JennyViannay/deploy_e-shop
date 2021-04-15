@@ -1,4 +1,4 @@
-{% extends 'layout.html.twig' %}
+{% extends 'layout-admin.html.twig' %}
 {% block title %}- Admin - Edit Article #{{article.id}}{% endblock %}
 
 {% block content %}
@@ -75,6 +75,7 @@
                     <a href="#" onclick="addInputImage()" class="btn btn-sm btn-pumpkin mb-3 m-auto" id="btn-add-image">
                         <i class="fas fa-plus-circle"></i></a>
                 </p>
+                {{dump(article)}}
                 {% set countImg = article.images|length %}
                 {% for i in 0..countImg -1 %}
                 <div class="form-group image-cls" id="images">
@@ -88,7 +89,7 @@
                         <img src="{{ article.images[i].url }}" alt="{{article.model}}" class="img-fluid mx-auto" style="width: 200px">
                     </div>
                     <div class="col-2">
-                        <a href="/admin/deleteImage/{{article.images[i].id}}/{{ article.id}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                        <a href="/admin/deleteImage/{{article.images[i].id}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                     </div>
                 </div>
                 {% endfor %}

@@ -11,6 +11,12 @@ class UserManager extends AbstractManager
         parent::__construct(self::TABLE);
     }
 
+    public function selectAll(): array
+    {
+        return $this->pdo->query("SELECT user.id, user.email, user.username, role.name as role_name FROM user
+        JOIN role ON role.id = user.role_id ORDER BY email")->fetchAll();
+    }
+
     public function search(string $email)
     {
         $statement = $this->pdo->prepare("SELECT * FROM " . self::TABLE . " WHERE email=:email");

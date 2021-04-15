@@ -14,7 +14,7 @@ class ArticleManager extends AbstractManager
     public function selectAll(): array
     {
         $articles = $this->pdo->query("SELECT
-        art.id, art.brand_id, art.model, art.qty, art.model, art.price, art.size_id, art.color_id, 
+        art.id, art.brand_id, art.model, art.qty, art.price, art.size_id, art.color_id, 
         brand.name as brand_name,
         color.name as color_name,
         size.size as size 
@@ -297,7 +297,7 @@ class ArticleManager extends AbstractManager
     // PRIVATES METHODS
     private function getImages(array $article)
     {
-        $statementImg = $this->pdo->prepare('SELECT url FROM image WHERE article_id=:article_id');
+        $statementImg = $this->pdo->prepare('SELECT id, url FROM image WHERE article_id=:article_id');
         $statementImg->bindValue('article_id', $article['id'], \PDO::PARAM_INT);
         $statementImg->execute();
 
